@@ -1,0 +1,59 @@
+version: "3.7"
+services:
+    app-nginx:
+        build:
+            context: docker
+            dockerfile: development/nginx/Dockerfile
+        ports:
+            - "80:80"
+        volumes:
+            - ./:/var/www
+        depends_on:
+            - app-php-fpm
+
+    app-php-fpm:
+        build:
+            context: docker
+            dockerfile: development/php-fpm/Dockerfile
+        environment:
+            APP_ENV: dev
+            APP_DEBUG: 1
+            DB_HOST: app-db
+            DB_USER: app
+            DB_PASSWORD: secret
+            DB_NAME: app
+        volumes:
+            - ./:/var/www
+        depends_on:
+            - app-db
+
+    app-php-cli:
+        tty: true
+        build:
+            context: docker
+            dockerfile: development/php-cli/Dockerfile
+        environment:
+            APP_ENV: dev
+            APP_DEBUG: 1
+            DB_HOST: app-db
+            DB_USER: app
+            DB_PASSWORD: secret
+            DB_NAME: app
+        volumes:
+            - ./:/var/www
+        depends_on:
+            - app-db
+
+    app-db:
+        image: postgres:12.2-alpine
+        environment:
+            POSTGRES_USER: app
+            POSTGRES_PASSWORD: secret
+            POSTGRES_DB: app
+        volumes:
+            - volume-postgres:/var/lib/postgresql/data
+        ports:
+            - "54321:5432"
+
+volumes:
+    volume-postgres:
