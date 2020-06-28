@@ -25,7 +25,7 @@ class Tag
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
      *
-     * @Groups({"tag:read"})
+     * @Groups({"tag:read", "article:read"})
      */
     private ?int $id;
 
@@ -34,7 +34,7 @@ class Tag
      *
      * @Assert\NotBlank()
      *
-     * @Groups({"tag:read", "tag:write"})
+     * @Groups({"tag:read", "tag:write", "article:read"})
      */
     private ?string $name;
 

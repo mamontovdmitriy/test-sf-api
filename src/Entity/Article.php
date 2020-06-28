@@ -2,11 +2,13 @@
 
 namespace App\Entity;
 
+use App\Filter\MonthYearPublicationFilter;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiSubresource;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
-use ApiPlatform\Core\Annotation\ApiSubresource;
+use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -20,14 +22,21 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @ApiResource(
  *     normalizationContext={"groups"={"article:read"}},
- *     denormalizationContext={"groups"={"article:write"}}
+ *     denormalizationContext={"groups"={"article:write"}},
+ *     order={"publishedAt":"ASC"},
+ *     collectionOperations={
+ *         "get"={
+ *              "filters"={"article.publication_filter"}
+ *         },
+ *         "post"
+ *     }
  * )
- * @ApiFilter(OrderFilter::class,  properties={"publishedAt"})
- * @ApiFilter(SearchFilter::class, properties={"tags.name": "exact"})
+ * @ApiFilter(OrderFilter::class)
+ * @ApiFilter(PropertyFilter::class)
+ * @ApiFilter(SearchFilter::class, properties={"tags.name": "exact", "status.id": "exact", "year": "exact", "month": "exact"})
  * @ORM\Entity()
  * @Gedmo\SoftDeleteable()
  */
-// @ ORM\HasLifecycleCallbacks()
 class Article
 {
     use SoftDeleteableEntity;
@@ -66,6 +75,7 @@ class Article
      * @ORM\ManyToOne(targetEntity=Status::class, inversedBy="articles")
      *
      * @Assert\NotBlank()
+     * @Assert\Type(type=Status::class)
      *
      * @Groups({"article:read", "article:write"})
      * @ApiSubresource(maxDepth=1)
@@ -86,8 +96,8 @@ class Article
      * @ORM\ManyToMany(targetEntity=Tag::class, inversedBy="articles")
      *
      * @Groups({"article:read", "article:write"})
-     * @ApiSubresource()
-     * @ MaxDepth(1) maxDepth=1
+     * @ApiSubresource(maxDepth=1)
+     * @MaxDepth(1)
      */
     private Collection $tags;
 

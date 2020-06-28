@@ -25,14 +25,14 @@ class Status
      * @ORM\Id()
      * @ORM\Column(type="integer")
      *
-     * @Groups({"status:read"})
+     * @Groups({"status:read", "article:read"})
      */
     private ?int $id;
 
     /**
      * @ORM\Column(type="string", length=32, options={"comment":"Name of the article status"})
      *
-     * @Groups({"status:read"})
+     * @Groups({"status:read", "article:read"})
      */
     private ?string $name;
 

@@ -25,3 +25,11 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+
+    App\Filter\MonthYearPublicationFilter:
+        arguments: ['@doctrine', '@request_stack', '@?logger', {year: ~, month: ~}]
+        tags:
+            - { name: 'api_platform.filter', id: 'article.publication_filter' }
+        autowire: false
+        autoconfigure: false
