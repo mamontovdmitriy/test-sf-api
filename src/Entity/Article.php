@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiProperty;
 use App\Filter\MonthYearPublicationFilter;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
@@ -23,13 +24,13 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ApiResource(
  *     normalizationContext={"groups"={"article:read"}},
  *     denormalizationContext={"groups"={"article:write"}},
- *     order={"publishedAt":"ASC"},
  *     collectionOperations={
  *         "get"={
  *              "filters"={"article.publication_filter"}
  *         },
  *         "post"
- *     }
+ *     },
+ *     order={"publishedAt":"ASC"}
  * )
  * @ApiFilter(OrderFilter::class)
  * @ApiFilter(PropertyFilter::class)
@@ -91,6 +92,15 @@ class Article
      * @Gedmo\Timestampable(on="change", field="status.name", value="PUBLISH")
      */
     private ?\DateTimeInterface $publishedAt;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Media::class, mappedBy="article")
+     *
+     * @Groups({"article:read", "article:write"})
+     * @ApiSubresource(maxDepth=1)
+     * @MaxDepth(1)
+     */
+    private Collection $photos;
 
     /**
      * @ORM\ManyToMany(targetEntity=Tag::class, inversedBy="articles")
@@ -182,6 +192,29 @@ class Article
     {
         if ($this->tags->contains($tag)) {
             $this->tags->removeElement($tag);
+        }
+
+        return $this;
+    }
+
+    public function getPhotos(): Collection
+    {
+        return $this->photos;
+    }
+
+    public function addPhoto(Media $photo): self
+    {
+        if (!$this->photos->contains($photo)) {
+            $this->photos[] = $photo;
+        }
+
+        return $this;
+    }
+
+    public function removePhoto(Media $photo): self
+    {
+        if ($this->photos->contains($photo)) {
+            $this->photos->removeElement($photo);
         }
 
         return $this;
