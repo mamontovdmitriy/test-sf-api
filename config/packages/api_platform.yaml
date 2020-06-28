@@ -5,3 +5,12 @@ api_platform:
         json: ['application/merge-patch+json']
     swagger:
         versions: [3]
+
+#    formats:
+#        json:
+#            mime_types: ['application/json']
+
+    collection:
+        pagination:
+            # The default number of items per page.
+            items_per_page: 5
